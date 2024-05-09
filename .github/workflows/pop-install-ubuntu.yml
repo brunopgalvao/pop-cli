@@ -38,7 +38,11 @@ jobs:
         with:
           script: |
             const { Octokit } = require("@octokit/rest");
-            const octokit = new Octokit();
+            const octokit = new Octokit({
+              request: {
+                fetch: fetch
+              }
+            });
             const { data: releases } = await octokit.repos.listReleases({
               owner: "r0gue-io",
               repo: "pop-cli",
