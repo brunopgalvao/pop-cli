@@ -1,9 +1,9 @@
-const fetch = require('node-fetch');
-const octokit = require('@octokit/rest')({
-  request: { fetch }
-});
+import fetch from 'node-fetch';
+import { Octokit } from '@octokit/rest';
+
 async function getLatestRelease() {
   try {
+    const octokit = new Octokit({ request: { fetch } });
     const { data: releases } = await octokit.repos.listReleases({
       owner: "r0gue-io",
       repo: "pop-cli",
@@ -16,4 +16,5 @@ async function getLatestRelease() {
     process.exit(1);
   }
 }
+
 getLatestRelease();
