@@ -32,5 +32,4 @@ jobs:
         docker exec ${{ steps.docker_run.outputs.container_id }} ls -l .
         sleep 3  # Wait for 3 seconds
         docker exec ${{ steps.docker_run.outputs.container_id }} chmod +x pop
-        docker exec ${{ steps.docker_run.outputs.container_id }} ls -l .
-        docker exec ${{ steps.docker_run.outputs.container_id }} pop --version
+        docker exec ${{ steps.docker_run.outputs.container_id }} sh -c './pop --version'
