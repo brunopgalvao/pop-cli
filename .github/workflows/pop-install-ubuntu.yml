@@ -12,6 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install @octokit/rest
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -59,4 +67,4 @@ jobs:
 
       - name: Execute pop-cli binary
         run: |
-          docker exec ${{ steps.docker_run.outputs.container_id }} ./pop-x86_64-unknown-linux-gnu/pop-cli --help
+          docker exec ${{ steps.docker_run.outputs.container_id }} ./pop-x86_64-unknown-linux-gnu/pop-cli
