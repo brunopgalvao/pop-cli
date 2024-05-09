@@ -25,10 +25,15 @@ jobs:
         sleep 5  # Wait for 5 seconds
         echo "::set-output name=container_id::$(docker ps -q)"
 
-    - name: Get pop-cli binary
+    - name: Download and extract pop binary
       run: |
         docker exec ${{ steps.docker_run.outputs.container_id }} wget https://github.com/r0gue-io/pop-cli/releases/download/0.1.0-alpha.1/pop-x86_64-unknown-linux-gnu.tar.gz
-        docker exec ${{ steps.docker_run.outputs.container_id }} tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
+        docker exec ${{ steps.docker_run.outputs.container_id }} tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz -C /usr/local/bin/
+        docker exec ${{ steps.docker_run.outputs.container_id }} chmod +x /usr/local/bin/pop
+
+    - name: Verify pop binary
+      run: |
+        docker exec ${{ steps.docker_run.outputs.container_id }} ls -l /usr/local/bin/pop
 
     - name: Execute pop-cli binary
-      run: docker exec ${{ steps.docker_run.outputs.container_id }} ./pop --version
+      run: docker exec ${{ steps.docker_run.outputs.container_id }} /usr/local/bin/pop
