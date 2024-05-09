@@ -22,6 +22,7 @@ jobs:
       id: docker_run
       run: |
         docker run -d pop-install-ubuntu
+        sleep 5  # Wait for 5 seconds
         echo "::set-output name=container_id::$(docker ps -q)"
 
     - name: Execute pop-cli binary
