@@ -15,18 +15,6 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: Install node-fetch
-      run: npm install node-fetch
-
-    - name: Get latest pop-cli release
-      id: get_release
-      run: node get_latest_release.js
-
-    - name: Download pop-cli release
-      run: |
-        wget ${{ steps.get_release.outputs.asset_url }}
-        tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
-
     - name: Run Docker container
       id: docker_run
       run: |
@@ -35,4 +23,6 @@ jobs:
 
     - name: Execute pop-cli binary
       run: |
-        docker exec ${{ steps.docker_run.outputs.container_id }} ./pop-x86_64-unknown-linux-gnu/pop-cli
+        docker exec ${{ steps.docker_run.outputs.container_id }} wget https://github.com/r0gue-io/pop-cli/releases/download/0.1.0-alpha.1/pop-x86_64-unknown-linux-gnu.tar.gz
+        docker exec ${{ steps.docker_run.outputs.container_id }} tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
+        docker exec ${{ steps.docker_run.outputs.container_id }} pop --help
