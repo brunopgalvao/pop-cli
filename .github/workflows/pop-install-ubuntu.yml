@@ -9,66 +9,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-      - name: Install dependencies
-        run: npm install @octokit/rest
+    - name: Install node-fetch
+      run: npm install node-fetch
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+    - name: Get latest pop-cli release
+      id: get_release
+      run: |
+        const fetch = require('node-fetch');
+        const octokit = require('@octokit/rest')({
+          request: { fetch }
+        });
+        const { data: releases } = await octokit.repos.listReleases({
+          owner: "r0gue-io",
+          repo: "pop-cli",
+        });
+        const latestRelease = releases[0];
+        const asset = latestRelease.assets.find(asset => asset.name.endsWith("linux-gnu.tar.gz"));
+        console.log(`::set-output name=asset_url::${asset.browser_download_url}`);
 
-      - name: Build Docker image
-        run: docker build -t pop-install-ubuntu -f Dockerfile.ubuntu .
+    - name: Download pop-cli release
+      run: |
+        wget ${{ steps.get_release.outputs.asset_url }}
+        tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
 
-      - name: Run Docker container
-        id: docker_run
-        run: |
-          docker run -d pop-install-ubuntu
-          echo "::set-output name=container_id::$(docker ps -q)"
+    - name: Run Docker container
+      id: docker_run
+      run: |
+        docker run -d pop-install-ubuntu
+        echo "::set-output name=container_id::$(docker ps -q)"
 
-      - name: Get latest pop-cli release
-        id: get_release
-        uses: actions/github-script@v5
-        with:
-          script: |
-            const { Octokit } = require("@octokit/rest");
-            const octokit = new Octokit({
-              request: {
-                fetch: fetch
-              }
-            });
-            const { data: releases } = await octokit.repos.listReleases({
-              owner: "r0gue-io",
-              repo: "pop-cli",
-            });
-            const latestRelease = releases[0];
-            console.log(latestRelease);
-            const asset = latestRelease.assets.find(asset => asset.name.endsWith("linux-gnu.tar.gz"));
-            console.log(asset);
-            console.log(asset.browser_download_url);
-            console.log(asset.name);
-            console.log(asset.id);
-            console.log(asset.size);
-            console.log(asset.created_at);
-            console.log(asset.updated_at);
-            console.log(asset.content_type);
-            console.log(asset.download_count);
-            console.log(asset.state);
-            console.log(asset.labels);
-            console.log(asset);
-            console.log(`::set-output name=asset_url::${asset.browser_download_url}`);
-
-      - name: Download pop-cli release
-        run: |
-          wget ${{ steps.get_release.outputs.asset_url }}
-          tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
-
-      - name: Execute pop-cli binary
-        run: |
-          docker exec ${{ steps.docker_run.outputs.container_id }} ./pop-x86_64-unknown-linux-gnu/pop-cli
+    - name: Execute pop-cli binary
+      run: |
+        docker exec ${{ steps.docker_run.outputs.container_id }} ./pop-x86_64-unknown-linux-gnu/pop-cli
