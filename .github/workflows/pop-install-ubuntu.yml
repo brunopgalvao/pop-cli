@@ -15,6 +15,9 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
+    - name: Build Docker image
+      run: docker build -t pop-install-ubuntu -f Dockerfile.ubuntu .
+
     - name: Run Docker container
       id: docker_run
       run: |
