@@ -36,4 +36,4 @@ jobs:
         docker exec ${{ steps.docker_run.outputs.container_id }} ls -l /usr/local/bin/pop
 
     - name: Execute pop-cli binary
-      run: docker exec ${{ steps.docker_run.outputs.container_id }} /usr/local/bin/pop
+      run: docker exec ${{ steps.docker_run.outputs.container_id }} /usr/local/bin/pop --help

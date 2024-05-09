@@ -18,4 +18,17 @@ FROM ubuntu:latest
 # ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Set up the GitHub workflow entrypoint
+
+# Download the release binary
+RUN wget https://github.com/r0gue-io/pop-cli/releases/download/0.1.0-alpha.1/pop-x86_64-unknown-linux-gnu.tar.gz
+
+# Extract the binary from the tarball
+RUN tar -xzf pop-x86_64-unknown-linux-gnu.tar.gz
+
+# Make the binary executable
+RUN chmod +x pop
+
+# Specify the command to run when the container starts
+CMD ["./pop"]
+
 ENTRYPOINT ["bash"]
